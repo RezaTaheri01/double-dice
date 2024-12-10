@@ -65,8 +65,6 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
         if chat_id in user_cooldowns:  # O(1)
             elapsed_time = now() - user_cooldowns[user_id]
             if elapsed_time < COOLDOWN_DURATION:
-                if query:
-                    await query.edit_message_reply_markup(reply_markup=keys_markup)
                 # Inform user that they are still on cooldown
                 await context.bot.sendMessage(chat_id=chat_id,
                                               text=f"Please wait {COOLDOWN_DURATION - int(elapsed_time)} seconds before rolling again."
