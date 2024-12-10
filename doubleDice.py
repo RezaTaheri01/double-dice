@@ -99,6 +99,7 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
 async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         query: CallbackQuery = update.callback_query
+        await query.answer()
         await roll_dice(update, context, query)
     except Exception as e:
         logger.error(f"Error in callback_query_handler function: {e}")
