@@ -48,7 +48,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, text: str = 
         if not text:
             text = "Welcome! What would you like to do?"
 
-        await update._bot.send_message(
+        await context.bot.send_message(
             chat_id=chat_id,
             text=text,
             reply_markup=keys_markup
@@ -84,7 +84,7 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
             await query.edit_message_reply_markup(reply_markup=empty_key_markup)
 
         for _ in range(int(command[-1])):
-            await update._bot.send_dice(
+            await context.bot.send_dice(
                 chat_id=chat_id
             )
 
