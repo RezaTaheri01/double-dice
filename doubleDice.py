@@ -10,6 +10,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup  # button
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from telegram.ext import CallbackQueryHandler
 
+
 # get token
 bot_token = config("token")  # create .env file and add token=<your-token>
 
@@ -66,9 +67,15 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
             elapsed_time = now() - user_cooldowns[user_id]
             if elapsed_time < COOLDOWN_DURATION:
                 # Inform user that they are still on cooldown
-                await context.bot.sendMessage(chat_id=chat_id,
-                                              text=f"Please wait {COOLDOWN_DURATION - int(elapsed_time)} seconds before rolling again."
-                                              )
+                msg = await context.bot.sendMessage(
+                    chat_id=chat_id,
+                    text=f"Please wait {COOLDOWN_DURATION - int(elapsed_time)} seconds before rolling again."
+                )
+
+                # Schedule deletion of the message
+                context.job_queue.run_once(
+                    delete_message, COOLDOWN_DURATION - int(elapsed_time), data={'chat_id': chat_id, 'message_id': msg.message_id}
+                )
                 return
             else:
                 # Remove user from cooldown since the duration has passed
@@ -94,6 +101,16 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
         await start(update, context, "What would you like to do next?")
     except Exception as e:
         logger.error(f"Error in roll_dice function: {e}")
+
+
+# Function to delete the message
+async def delete_message(context: ContextTypes.DEFAULT_TYPE):
+    chat_id = context.job.data['chat_id']
+    message_id = context.job.data['message_id']
+    try:
+        await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+    except Exception as e:
+        print(f"Error deleting message: {e}")
 
 
 async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
