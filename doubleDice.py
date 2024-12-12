@@ -74,7 +74,7 @@ async def roll_dice(update: Update, context: ContextTypes.DEFAULT_TYPE, query: C
 
                 # Schedule deletion of the message
                 context.job_queue.run_once(
-                    delete_message, COOLDOWN_DURATION - int(elapsed_time), data={'chat_id': chat_id, 'message_id': msg.message_id}
+                    delete_message, 1, data={'chat_id': chat_id, 'message_id': msg.message_id}
                 )
                 return
             else:
